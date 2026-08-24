@@ -1,8 +1,11 @@
 <?php
+
 namespace App\Ai\Tools;
 
+use App\Models\Dataset;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Laravel\Ai\Contracts\Tool;
 use Laravel\Ai\Tools\Request;
 
@@ -26,20 +29,23 @@ class ExecutePythonAnalysisTool implements Tool
         $datasetId = $request->integer('dataset_id');
         $query = $request->string('user_query');
 
+        Log::debug("Executing Python analysis for dataset ID: {$datasetId} with query: {$query}");
+
         // 1. Fetch file path & schema summary stored in Laravel
-        $dataset = \App\Models\Dataset::findOrFail($datasetId);
+        $dataset = Dataset::findOrFail($datasetId);
 
         // 2. Call the Python FastAPI microservice
         $response = Http::timeout(30)
-            ->baseUrl(config('services.python_engine.url', 'http://127.0.0.1:8000'))
+            ->baseUrl(config('services.python_engine.url', 'http://127.0.0.1:8090'))
             ->post('/analyze', [
                 'file_path' => storage_path("app/private/{$dataset->file_path}"),
-                'schema' => $dataset->schema_json,
+                'schema_json' => $dataset->schema_json,
                 'prompt' => $query,
             ]);
 
+        Log::debug("Python analysis response: " . $response->body());
         if ($response->failed()) {
-            return "Failed to execute Python analysis: " . $response->body();
+            return 'Failed to execute Python analysis: ' . $response->body();
         }
 
         // 3. Return the JSON string result back to the LLM agent

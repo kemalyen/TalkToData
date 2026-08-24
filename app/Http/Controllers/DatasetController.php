@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Dataset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class DatasetController extends Controller
 {
     public function index()
     {
         $datasets = auth()->user()->datasets()->latest()->get();
-         
+
         return view('datasets.index', compact('datasets'));
     }
 
@@ -22,6 +23,8 @@ class DatasetController extends Controller
         // 1. Store file in storage/app/private/datasets
         $path = $request->file('file')->store('datasets', 'local');
 
+
+        Log::info('Stored file at: ' . storage_path("app/private/{$path}"));
         // 2. Call Python FastAPI to profile dataset schema
         $pythonResponse = Http::post(config('services.python_engine.url') . '/profile-dataset', [
             'file_path' => storage_path("app/private/{$path}")

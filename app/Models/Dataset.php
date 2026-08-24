@@ -10,7 +10,15 @@ class Dataset extends Model
     /** @use HasFactory<\Database\Factories\DatasetFactory> */
     use HasFactory;
 
+    protected $fillable = ['name', 'file_path', 'schema_json', 'row_count'];
+
     protected $casts = ['schema_json' => 'array'];
-    public function user() { return $this->belongsTo(User::class); }
-    public function conversations() { return $this->hasMany(Conversation::class); }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+    public function conversations()
+    {
+        return $this->hasMany(Conversation::class);
+    }
 }

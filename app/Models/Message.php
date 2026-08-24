@@ -10,6 +10,11 @@ class Message extends Model
     /** @use HasFactory<\Database\Factories\MessageFactory> */
     use HasFactory;
 
+    protected $fillable = ['conversation_id', 'role', 'content', 'chart_payload'];
+
     protected $casts = ['chart_payload' => 'array'];
-public function conversation() { return $this->belongsTo(Conversation::class); }
+    public function conversation()
+    {
+        return $this->belongsTo(Conversation::class);
+    }
 }

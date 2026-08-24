@@ -10,6 +10,14 @@ class Conversation extends Model
     /** @use HasFactory<\Database\Factories\ConversationFactory> */
     use HasFactory;
 
-    public function dataset() { return $this->belongsTo(Dataset::class); }
-    public function messages() { return $this->hasMany(Message::class); }
+    protected $fillable = ['user_id', 'dataset_id', 'title', 'status'];
+
+    public function dataset()
+    {
+        return $this->belongsTo(Dataset::class);
+    }
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
 }

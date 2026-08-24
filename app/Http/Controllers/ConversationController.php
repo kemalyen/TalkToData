@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
- 
+
 
 use App\Models\Conversation;
 use App\Models\Dataset;
@@ -20,7 +20,7 @@ class ConversationController extends Controller
 
     public function show(Conversation $conversation)
     {
-        $this->authorize('view', $conversation);
+        //$this->authorize('view', $conversation);
         return view('conversations.show', compact('conversation'));
     }
 }

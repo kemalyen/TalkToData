@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'python_engine' => [
+        'url' => env('PYTHON_ENGINE_URL', 'http://localhost:8090'),
+    ],
+
 ];
