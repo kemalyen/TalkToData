@@ -6,6 +6,7 @@ use App\Ai\Tools\ExecutePythonAnalysisTool;
 use App\Models\Conversation;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
+use Throwable;
 
 use function Laravel\Ai\agent;
 
@@ -34,19 +35,76 @@ class ChatBot extends Component
             tools: [new ExecutePythonAnalysisTool]
         );
 
-        $response = $agent->prompt(
-            $userQuery,
-            provider: 'gemini',
-            model: env('GEMINI_TEXT_MODEL', 'gemini-3.1-flash-lite'),
-            timeout: 120,
-        );
-        Log::debug("Agent response: " . $response->text);
+        try {
+            $response = $agent->prompt(
+                $userQuery,
+                provider: 'gemini',
+                model: env('GEMINI_TEXT_MODEL', 'gemini-3.1-flash-lite'),
+                timeout: 120,
+            );
+        } catch (Throwable $exception) {
+            Log::error('Agent request failed.', ['exception' => $exception]);
+
+            $this->conversation->messages()->create([
+                'role' => 'assistant',
+                'content' => 'I could not complete the analysis. Please try again.',
+            ]);
+
+            return;
+        }
+
+        $toolResult = $response->toolResults->last()?->result;
+        $analysis = is_string($toolResult) ? json_decode($toolResult, true) : $toolResult;
+        $analysis = is_array($analysis) ? $analysis : [];
+        $hasSuccessfulAnalysis = ($analysis['status'] ?? null) === 'success';
+
+        if (! $hasSuccessfulAnalysis) {
+            $content = $analysis['reason'] ?? 'I can only answer questions about this uploaded dataset.';
+        } else {
+            $content = trim($response->text);
+        }
+
+        if ($hasSuccessfulAnalysis && $content === '') {
+            $content = $this->analysisFallback($analysis);
+        }
+
+        Log::debug('Agent response received.', [
+            'text' => $content,
+            'analysis' => $analysis,
+        ]);
 
         // 3. Save assistant response
         $this->conversation->messages()->create([
             'role' => 'assistant',
-            'content' => $response->text,
+            'content' => $content,
+            'chart_payload' => $analysis ?: null,
         ]);
+    }
+
+    private function analysisFallback(array $analysis): string
+    {
+        if (($analysis['status'] ?? null) !== 'success') {
+            return 'The analysis service did not return a usable result.';
+        }
+
+        $lines = [
+            'Dataset summary',
+            'Total rows: ' . ($analysis['row_count'] ?? 0),
+            'Columns: ' . collect($analysis['columns'] ?? [])->pluck('name')->implode(', '),
+        ];
+
+        foreach ($analysis['numeric_summary'] ?? [] as $column => $metrics) {
+            $lines[] = sprintf(
+                '%s: min %s, max %s, mean %s, sum %s',
+                $column,
+                $metrics['min'] ?? 'n/a',
+                $metrics['max'] ?? 'n/a',
+                $metrics['mean'] ?? 'n/a',
+                $metrics['sum'] ?? 'n/a',
+            );
+        }
+
+        return implode("\n", $lines);
     }
 
     public function render()
