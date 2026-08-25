@@ -3,6 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Conversation;
+use App\Models\Dataset;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,7 +20,10 @@ class ConversationFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'user_id' => User::factory(),
+            'dataset_id' => Dataset::factory(),
+            'title' => 'Analysis - '.now()->format('Y-m-d H:i'),
+            'status' => 'active',
         ];
     }
 }

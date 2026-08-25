@@ -53,6 +53,10 @@ class ChatBot extends Component
             return;
         }
 
+        Log::debug('Agent response received.', [
+            'text' => $response->text,
+            'toolResults' => $response->toolResults->toArray(),
+        ]);
         $toolResult = $response->toolResults->last()?->result;
         $analysis = is_string($toolResult) ? json_decode($toolResult, true) : $toolResult;
         $analysis = is_array($analysis) ? $analysis : [];

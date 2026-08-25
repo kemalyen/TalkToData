@@ -43,9 +43,9 @@ class ExecutePythonAnalysisTool implements Tool
                 'prompt' => $query,
             ]);
 
-        Log::debug("Python analysis response: " . $response->body());
+        Log::debug('Python analysis response: '.$response->body());
         if ($response->failed()) {
-            return 'Failed to execute Python analysis: ' . $response->body();
+            return 'Failed to execute Python analysis: '.$response->body();
         }
 
         // 3. Return the JSON string result back to the LLM agent

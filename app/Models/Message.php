@@ -2,17 +2,19 @@
 
 namespace App\Models;
 
+use Database\Factories\MessageFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Message extends Model
 {
-    /** @use HasFactory<\Database\Factories\MessageFactory> */
+    /** @use HasFactory<MessageFactory> */
     use HasFactory;
 
     protected $fillable = ['conversation_id', 'role', 'content', 'chart_payload'];
 
     protected $casts = ['chart_payload' => 'array'];
+
     public function conversation()
     {
         return $this->belongsTo(Conversation::class);
