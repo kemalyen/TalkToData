@@ -38,9 +38,7 @@ class ChatBot extends Component
         try {
             $response = $agent->prompt(
                 $userQuery,
-                provider: 'gemini',
-                model: env('GEMINI_TEXT_MODEL', 'gemini-3.1-flash-lite'),
-                timeout: 120,
+                timeout: 120
             );
         } catch (Throwable $exception) {
             Log::error('Agent request failed.', ['exception' => $exception]);

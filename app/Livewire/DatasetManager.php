@@ -21,7 +21,7 @@ class DatasetManager extends Component
 
         $this->activeConversation = $dataset->conversations()->create([
             'user_id' => auth()->id(),
-            'title' => 'Analysis - '.now()->format('Y-m-d H:i'),
+            'title' => 'Analysis - ' . now()->format('Y-m-d H:i'),
         ]);
     }
 
