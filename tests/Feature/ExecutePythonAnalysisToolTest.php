@@ -35,7 +35,7 @@ it('forwards the dataset analysis request to python and returns its response', f
     ]);
 
     Http::assertSent(function ($request) use ($dataset): bool {
-        return $request->url() === config('services.python_engine.url') . '/analyze'
+        return $request->url() === config('services.python_engine.url').'/analyze'
             && $request['file_path'] === storage_path("app/private/{$dataset->file_path}")
             && $request['schema_json'] === $dataset->schema_json
             && $request['prompt'] === 'Summarize amount totals';

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\Role;
 use App\Models\Message;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -18,7 +19,10 @@ class MessageFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'conversation_id' => ConversationFactory::new(),
+            'role' => Role::USER,
+            'content' => fake()->sentence(),
+            'chart_payload' => null,
         ];
     }
 }

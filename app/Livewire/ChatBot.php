@@ -38,9 +38,7 @@ class ChatBot extends Component
         try {
             $response = $agent->prompt(
                 $userQuery,
-                provider: 'gemini',
-                model: env('GEMINI_TEXT_MODEL', 'gemini-3.1-flash-lite'),
-                timeout: 120,
+                timeout: 120
             );
         } catch (Throwable $exception) {
             Log::error('Agent request failed.', ['exception' => $exception]);
@@ -53,11 +51,19 @@ class ChatBot extends Component
             return;
         }
 
+        Log::debug('Agent response received.', [
+            'text' => $response->text,
+            'toolResults' => $response->toolResults->toArray(),
+            'lastToolResult' => $response->toolResults->last()?->result
+        ]);
         $toolResult = $response->toolResults->last()?->result;
         $analysis = is_string($toolResult) ? json_decode($toolResult, true) : $toolResult;
         $analysis = is_array($analysis) ? $analysis : [];
         $hasSuccessfulAnalysis = ($analysis['status'] ?? null) === 'success';
-
+        Log::debug('Analysis result processed.', [
+            'analysis' => $analysis,
+            'hasSuccessfulAnalysis' => $hasSuccessfulAnalysis,
+        ]);
         if (! $hasSuccessfulAnalysis) {
             $content = $analysis['reason'] ?? 'I can only answer questions about this uploaded dataset.';
         } else {

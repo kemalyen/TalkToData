@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\Conversation;
 use App\Models\Dataset;
 
@@ -12,7 +11,7 @@ class ConversationController extends Controller
     {
         $conversation = $dataset->conversations()->create([
             'user_id' => auth()->id(),
-            'title' => 'Analysis - ' . now()->format('Y-m-d H:i'),
+            'title' => 'Analysis - '.now()->format('Y-m-d H:i'),
         ]);
 
         return redirect()->route('conversations.show', $conversation);
@@ -20,7 +19,7 @@ class ConversationController extends Controller
 
     public function show(Conversation $conversation)
     {
-        //$this->authorize('view', $conversation);
+        // $this->authorize('view', $conversation);
         return view('conversations.show', compact('conversation'));
     }
 }
