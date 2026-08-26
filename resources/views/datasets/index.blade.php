@@ -1,3 +1,3 @@
-<x-layouts::app :title="__('DataPulse AI')">
+<x-layouts::app :title="__('TalkToData')">
     <livewire:dataset-manager />
 </x-layouts::app>

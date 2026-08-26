@@ -56,12 +56,16 @@ class ChatBot extends Component
         Log::debug('Agent response received.', [
             'text' => $response->text,
             'toolResults' => $response->toolResults->toArray(),
+            'lastToolResult' => $response->toolResults->last()?->result
         ]);
         $toolResult = $response->toolResults->last()?->result;
         $analysis = is_string($toolResult) ? json_decode($toolResult, true) : $toolResult;
         $analysis = is_array($analysis) ? $analysis : [];
         $hasSuccessfulAnalysis = ($analysis['status'] ?? null) === 'success';
-
+        Log::debug('Analysis result processed.', [
+            'analysis' => $analysis,
+            'hasSuccessfulAnalysis' => $hasSuccessfulAnalysis,
+        ]);
         if (! $hasSuccessfulAnalysis) {
             $content = $analysis['reason'] ?? 'I can only answer questions about this uploaded dataset.';
         } else {
