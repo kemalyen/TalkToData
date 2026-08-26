@@ -16,7 +16,7 @@ class DatasetController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate(['file' => 'required|file|mimes:csv,txt|max:20480']);
+        $request->validate(['file' => 'required|file|mimes:csv,txt|max:5120']);
 
         // 1. Store file in storage/app/private/datasets
         $path = $request->file('file')->store('datasets', 'local');

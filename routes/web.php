@@ -4,7 +4,7 @@ use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\DatasetController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'throttle:ai-chat', 'throttle:ai-daily-cap'])->group(function () {
     Route::get('/', [DatasetController::class, 'index'])->name('home');
 
     // Datasets
