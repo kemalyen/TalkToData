@@ -73,7 +73,7 @@ Here are sample prompts using an inventory dataset (`stock_date`, `material`, `m
 ### 1. Clone & Configure Laravel Backend
 
 ```bash
-git clone [https://github.com/your-username/TalkToData.git](https://github.com/your-username/TalkToData.git)
+git clone [https://github.com/kemalyen/TalkToData.git](https://github.com/kemalyen/TalkToData.git)
 cd TalkToData
 
 # Install PHP dependencies
@@ -97,6 +97,8 @@ npm install && npm run build
 ### 2. Setup Python Intelligence Microservice
 
 ```bash
+git clone [https://github.com/kemalyen/TalkToData-python-engine.git](https://github.com/kemalyen/TalkToData-python-engine.git) python-backend
+ 
 cd python-backend
 
 # Create virtual environment
