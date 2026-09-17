@@ -5,6 +5,8 @@ namespace App\Models;
 use Database\Factories\DatasetFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Dataset extends Model
 {
@@ -15,12 +17,18 @@ class Dataset extends Model
 
     protected $casts = ['schema_json' => 'array'];
 
-    public function user()
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function conversations()
+    /**
+     * @return HasMany<Conversation, $this>
+     */
+    public function conversations(): HasMany
     {
         return $this->hasMany(Conversation::class);
     }

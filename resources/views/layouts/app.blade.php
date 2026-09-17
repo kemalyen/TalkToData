@@ -14,6 +14,7 @@
         </flux:toast.group>
     @endpersist
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    @livewireScripts
     @fluxScripts
 </body>
 </html>

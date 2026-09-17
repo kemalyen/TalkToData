@@ -3,19 +3,24 @@
 namespace App\Livewire;
 
 use Flux\Flux;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 
 class DatasetUpload extends Component
 {
     use WithFileUploads;
 
-    public $file;
+    public ?TemporaryUploadedFile $file = null;
 
-    public $fileName = '';
+    public string $fileName = '';
 
+    /**
+     * @return array<string, string>
+     */
     protected function rules(): array
     {
         return [
@@ -23,14 +28,14 @@ class DatasetUpload extends Component
         ];
     }
 
-    public function updatedFile($value)
+    public function updatedFile(?TemporaryUploadedFile $value): void
     {
         if ($value) {
             $this->fileName = $value->getClientOriginalName();
         }
     }
 
-    public function upload()
+    public function processUpload(): void
     {
         $this->validate();
 
@@ -55,7 +60,7 @@ class DatasetUpload extends Component
         Flux::toast('Dataset uploaded and profiled!', variant: 'success');
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.dataset-upload');
     }

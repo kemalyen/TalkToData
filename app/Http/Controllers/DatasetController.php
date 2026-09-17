@@ -3,18 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Dataset;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class DatasetController extends Controller
 {
-    public function index()
+    public function index(): View
     {
         return view('datasets.index');
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $request->validate(['file' => 'required|file|mimes:csv,txt|max:20480']);
 
@@ -38,7 +40,7 @@ class DatasetController extends Controller
         return redirect()->route('datasets.index')->with('success', 'Dataset uploaded and profiled!');
     }
 
-    public function destroy(Dataset $dataset)
+    public function destroy(Dataset $dataset): RedirectResponse
     {
         $dataset->delete();
 
