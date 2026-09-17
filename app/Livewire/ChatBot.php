@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Ai\Tools\ExecutePythonAnalysisTool;
 use App\Models\Conversation;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Throwable;
@@ -16,7 +17,7 @@ class ChatBot extends Component
 
     public string $prompt = '';
 
-    public function sendMessage()
+    public function sendMessage(): void
     {
         $this->validate(['prompt' => 'required|string']);
 
@@ -54,7 +55,7 @@ class ChatBot extends Component
         Log::debug('Agent response received.', [
             'text' => $response->text,
             'toolResults' => $response->toolResults->toArray(),
-            'lastToolResult' => $response->toolResults->last()?->result
+            'lastToolResult' => $response->toolResults->last()?->result,
         ]);
         $toolResult = $response->toolResults->last()?->result;
         $analysis = is_string($toolResult) ? json_decode($toolResult, true) : $toolResult;
@@ -87,33 +88,55 @@ class ChatBot extends Component
         ]);
     }
 
+    /**
+     * @param  array<string, mixed>  $analysis
+     */
     private function analysisFallback(array $analysis): string
     {
         if (($analysis['status'] ?? null) !== 'success') {
             return 'The analysis service did not return a usable result.';
         }
 
+        $columnNames = [];
+        $columns = $analysis['columns'] ?? [];
+
+        if (is_array($columns)) {
+            foreach ($columns as $column) {
+                if (is_array($column) && is_string($column['name'] ?? null)) {
+                    $columnNames[] = $column['name'];
+                }
+            }
+        }
+
         $lines = [
             'Dataset summary',
-            'Total rows: ' . ($analysis['row_count'] ?? 0),
-            'Columns: ' . collect($analysis['columns'] ?? [])->pluck('name')->implode(', '),
+            'Total rows: '.($analysis['row_count'] ?? 0),
+            'Columns: '.implode(', ', $columnNames),
         ];
 
-        foreach ($analysis['numeric_summary'] ?? [] as $column => $metrics) {
-            $lines[] = sprintf(
-                '%s: min %s, max %s, mean %s, sum %s',
-                $column,
-                $metrics['min'] ?? 'n/a',
-                $metrics['max'] ?? 'n/a',
-                $metrics['mean'] ?? 'n/a',
-                $metrics['sum'] ?? 'n/a',
-            );
+        $numericSummary = $analysis['numeric_summary'] ?? [];
+
+        if (is_array($numericSummary)) {
+            foreach ($numericSummary as $column => $metrics) {
+                if (! is_array($metrics)) {
+                    continue;
+                }
+
+                $lines[] = sprintf(
+                    '%s: min %s, max %s, mean %s, sum %s',
+                    $column,
+                    $metrics['min'] ?? 'n/a',
+                    $metrics['max'] ?? 'n/a',
+                    $metrics['mean'] ?? 'n/a',
+                    $metrics['sum'] ?? 'n/a',
+                );
+            }
         }
 
         return implode("\n", $lines);
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.chat-bot', [
             'messages' => $this->conversation->messages()->orderBy('created_at')->get(),
